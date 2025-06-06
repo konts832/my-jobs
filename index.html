@@ -22,5 +22,17 @@
   <ul id="job-list"></ul>
 
   <script src="script.js"></script>
+
+<script type="application/javascript">
+  function resize(id, source) {
+    var iframe = document.getElementById(id);
+    window.addEventListener('message', function(e) {
+      if(e.origin !== source) return;
+      if(isNaN(e.data.height)) return;
+      iframe.height = (e.data.height + 72) + "px";
+    }, false);
+  }
+</script>
+<iframe src="https://dev.socrata.com/foundry/data.cityofnewyork.us/kpav-sd4t/embed" style="border-width:0" width="1020px" height="1000px" frameborder="0" id="embed-kpav-sd4t" scrolling="yes" onload="resize('embed-kpav-sd4t', 'https://dev.socrata.com');"></iframe>
 </body>
 </html>
