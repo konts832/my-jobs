@@ -2,10 +2,15 @@ const API_URL = "https://data.cityofnewyork.us/resource/kpav-sd4t.json?$limit=20
 let jobs = [];
 
 async function fetchJobs() {
-  const res = await fetch(API_URL);
-  jobs = await res.json();
-  renderJobs(jobs);
-  populateAgencies(jobs);
+  try {
+    const res = await fetch(API_URL);
+    jobs = await res.json();
+    console.log("Jobs fetched:", jobs.length);
+    renderJobs(jobs);
+    populateAgencies(jobs);
+  } catch (err) {
+    console.error("Failed to fetch jobs:", err);
+  }
 }
 
 function populateAgencies(data) {
@@ -30,7 +35,11 @@ function renderJobs(data) {
     return acc;
   }, {});
 
-  const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
+  const sortedDates = Object.keys(grouped).sort((a, b) => {
+    const aDate = new Date(a);
+    const bDate = new Date(b);
+    return bDate - aDate;
+  });
 
   sortedDates.forEach(date => {
     const header = document.createElement("h2");
@@ -60,10 +69,10 @@ function filterJobs() {
   const query = document.getElementById("search").value.toLowerCase();
   const agencyFilter = document.getElementById("agency-filter").value;
 
-  let filtered = jobs.filter(job => {
+  const filtered = jobs.filter(job => {
     const matchesQuery =
-      job.civil_service_title?.toLowerCase().includes(query) ||
-      job.agency?.toLowerCase().includes(query);
+      (job.civil_service_title || "").toLowerCase().includes(query) ||
+      (job.agency || "").toLowerCase().includes(query);
     const matchesAgency = !agencyFilter || job.agency === agencyFilter;
     return matchesQuery && matchesAgency;
   });
